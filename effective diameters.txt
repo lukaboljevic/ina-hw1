@@ -1,0 +1,12 @@
+Graph: aps_2010_2011
+Time taken to calculate d90: 495.3648386 seconds
+d90: 15
+
+Graph: aps_2010_2012
+Time taken to calculate d90: 3485.2480126 seconds
+d90: 13
+
+Graph: aps_2010_2013
+Time taken to calculate d90: 10374.5328348 seconds
+d90: 11
+

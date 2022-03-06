@@ -1,0 +1,15 @@
+Graph: aps_2010_2011
+Diameter: 34
+Start node: 13884
+End node: 1431
+
+Graph: aps_2010_2012
+Diameter: 33
+Start node: 15430
+End node: 28322
+
+Graph: aps_2010_2013
+Diameter: 29
+Start node: 8009
+End node: 1328
+
