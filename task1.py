@@ -50,12 +50,14 @@ def read_graph(graph_label, directed):
 ##### Problem 1.3 - strongly connected components #####
 #######################################################
 
-def dfs(graph, starting_node, visited):
+def dfs(graph, starting_node):
     """
     Perform iterative DFS on the graph, given a starting node.
     Return which nodes have been visited during this search.
     """
+    n = len(graph)
     stack = [starting_node]
+    visited = np.full((1, n+1), False).flatten()
     visited[starting_node] = True
     reached = []
 
@@ -70,7 +72,7 @@ def dfs(graph, starting_node, visited):
     
     return reached
 
-def dfs_transpose(graph, starting_node, visited, reached_original, total_computed):
+def dfs_transpose(graph, starting_node, reached_original, total_computed):
     """
     Perform iterative DFS on the (transpose) graph, given a starting node.
     reached_original is a list of nodes visited/reached during DFS on the 
@@ -82,7 +84,9 @@ def dfs_transpose(graph, starting_node, visited, reached_original, total_compute
     DFS on the original, and transpose graph, will give us a SCC.
     We can compute the component right away, i.e. during the search itself.
     """
+    n = len(graph)
     stack = [starting_node]
+    visited = np.full((1, n+1), False).flatten()
     visited[starting_node] = True
     component = []
 
@@ -124,23 +128,19 @@ def enron_components():
 
     num_components = 0
     largest_component = 0
-    visited = np.full((1, n+1), False).flatten()
-    transpose_visited = np.full((1, n+1), False).flatten()
     total_computed = np.full((1, n+1), False).flatten()
     start_time = time.perf_counter()
 
     for i, node in enumerate(graph):
         print(f"Remaining: {n - (i+1)}")
-
-        if not total_computed[node]:
-            num_components += 1
-            reached = dfs(graph, node, visited.copy())
-            component = dfs_transpose(transpose_graph, node, transpose_visited.copy(), reached, total_computed)
-        else:
-            # don't do useless work
+        if total_computed[node]:
             continue
 
+        num_components += 1
+        reached = dfs(graph, node)
+        component = dfs_transpose(transpose_graph, node, reached, total_computed)
         largest_component = max(largest_component, len(component))
+        
 
     print(f"Number of components: {num_components}")
     print(f"Largest component: {largest_component}, which is {round((largest_component / n)*100, 3)}%")
@@ -263,4 +263,4 @@ def diameters():
 
 # effective_diameters()
 # diameters()
-# enron_components()
+enron_components()

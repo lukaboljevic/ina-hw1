@@ -1,15 +1,21 @@
 from collections import defaultdict
 import random
+from tracemalloc import start
 import networkx as nx
 import matplotlib.pyplot as plt
-from math import factorial, exp, pow
+from math import factorial, exp, pow, ceil
 
 def random_node(graph):
+    """
+    Assume a graph with edge representation
+    """
     # Graph will be represented using an edge list
     # So something like [(1, 2), (1, 3)]
-    # We select a random edge (1/m for each, prob. I select some node is k_i/m)
-    # Then selected a random node from there (probability 1/2 for node i)
+    # We select a random edge (1/m for each, prob. I 
+    # select some node is k_i/m) Then select a random 
+    # node from there (probability 1/2 for node i)
     # Total is k_i/2m
+
     m = len(graph)
     index = random.randrange(0, m) # random edge
     node = random.randrange(0, 2) # random node
@@ -56,6 +62,29 @@ def degree_distribution(sequence, n):
         distribution[degree] /= n
     return distribution
 
+def preferential(n, avg_degree):
+    """
+    Construct the "preferential attachment model" based on
+    the instructions given in the homework. 
+    """
+    starting_num_nodes = ceil(avg_degree) + 1 # 26 + 1
+    num_neighbors = ceil(avg_degree / 2)
+
+    # Start with a complete graph on ceil(avg_degree) + 1 nodes
+    # i.e. each node has degree of average degree
+    graph = [(i, j) for i in range(starting_num_nodes) for j in range(starting_num_nodes) if j > i]
+    pref_sequence = [ceil(avg_degree)] * starting_num_nodes
+   
+    for node in range(starting_num_nodes, n):
+        pref_sequence.append(num_neighbors) # degree of our newly added node
+        for _ in range(num_neighbors):
+            neighbor = random_node(graph)
+            graph.append((node, neighbor))
+            pref_sequence[neighbor] += 1
+
+    return pref_sequence
+
+
 def plot_stuff():
     """
     Plot all the degree distributions
@@ -63,6 +92,7 @@ def plot_stuff():
     graph = read_facebook()
     n = graph.number_of_nodes()
     m = graph.number_of_edges()
+    average_degree = 2*m / n
 
     """
     graph[i] - dictionary containing neighbors of i as keys
@@ -75,7 +105,6 @@ def plot_stuff():
     fb_distribution = degree_distribution(fb_sequence, n)
 
     # Erdos-Renyi degree distribution
-    average_degree = 2*m / n
     erdos = nx.gnm_random_graph(n, m)
     erdos_sequence = [erdos.degree[node] for node in erdos.nodes() if erdos.degree[node] > 0]
     erdos_distribution = degree_distribution(erdos_sequence, n)
@@ -87,17 +116,24 @@ def plot_stuff():
         denominator = factorial(degree)
         erdos_theoretical[degree] = numerator / denominator
 
+    # Preferential model
+    pref_sequence = preferential(n, average_degree)
+    pref_distribution = degree_distribution(pref_sequence, n)
+
     # Plot
     plt.style.use("ggplot")
     plt.figure(figsize=(14, 8))
     plt.plot(list(fb_distribution.keys()), list(fb_distribution.values()), 
-        'o', color="forestgreen", label="Facebook sample")
+        "o", color="forestgreen", label="Facebook sample")
     plt.plot(
         list(erdos_distribution.keys()), list(erdos_distribution.values()), 
-        'o', color='dodgerblue', label="Erdos Renyi G(n, m)")
+        "o", color="dodgerblue", label="Erdos Renyi G(n, m)")
     plt.plot(
         list(erdos_theoretical.keys()), list(erdos_theoretical.values()), 
-        color='firebrick', label="Erdos Renyi theoretical")
+        color="firebrick", label="Erdos Renyi theoretical")
+    plt.plot(
+        list(pref_distribution.keys()), list(pref_distribution.values()), 
+        "o", color="goldenrod", label="Preferential attachment")
     plt.title("Various degree distributions")
     plt.xscale("log")
     plt.yscale("log")
