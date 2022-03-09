@@ -1,6 +1,5 @@
 from collections import defaultdict
 import random
-from tracemalloc import start
 import networkx as nx
 import matplotlib.pyplot as plt
 from math import factorial, exp, pow, ceil
@@ -76,6 +75,7 @@ def preferential(n, avg_degree):
     pref_sequence = [ceil(avg_degree)] * starting_num_nodes
    
     for node in range(starting_num_nodes, n):
+        print(f"At node {node} out of {n}")
         pref_sequence.append(num_neighbors) # degree of our newly added node
         for _ in range(num_neighbors):
             neighbor = random_node(graph)
@@ -83,7 +83,6 @@ def preferential(n, avg_degree):
             pref_sequence[neighbor] += 1
 
     return pref_sequence
-
 
 def plot_stuff():
     """
@@ -138,8 +137,8 @@ def plot_stuff():
     plt.xscale("log")
     plt.yscale("log")
     plt.xlabel("Degree")
-    plt.xlabel("Number of nodes from the sample with this degree")
-    plt.subplots_adjust(left=0.052, bottom=0.086, right=0.964, top=0.945)
+    plt.ylabel("Degree distribution")
+    plt.subplots_adjust(left=0.072, bottom=0.086, right=0.964, top=0.945)
     plt.legend()
     plt.show()
 
