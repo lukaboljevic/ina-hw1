@@ -75,11 +75,17 @@ def preferential(n, avg_degree):
     pref_sequence = [ceil(avg_degree)] * starting_num_nodes
    
     for node in range(starting_num_nodes, n):
-        print(f"At node {node} out of {n}")
+        # print(f"At node {node} out of {n}")
         pref_sequence.append(num_neighbors) # degree of our newly added node
+        neighbors = []
         for _ in range(num_neighbors):
             neighbor = random_node(graph)
+            while neighbor == node or neighbor in neighbors:
+                # Don't allow for loops
+                # Don't allow for multilinks
+                neighbor = random_node(graph)
             graph.append((node, neighbor))
+            neighbors.append(neighbor)
             pref_sequence[neighbor] += 1
 
     return pref_sequence
